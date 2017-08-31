@@ -1,7 +1,4 @@
-﻿using Microsoft.Azure.WebJobs.Host.Config;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
+﻿using Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,66 +10,52 @@ namespace ExtensionsMetadataGenerator
 {
     public class ExtensionsMetadataGenerator
     {
-        private static Type configProviderType = typeof(IExtensionConfigProvider);
-        
         public static void Generate(string sourcePath, string outputPath)
         {
-            System.Console.WriteLine($"Generating extension {sourcePath} - {outputPath}");
-
             if (!Directory.Exists(sourcePath))
             {
                 throw new DirectoryNotFoundException($"The path `{sourcePath}` does not exist. Unable to generate Azure Functions extensions metadata file.");
             }
 
-            List<string> extensionObjects = new List<string>();
-            foreach (var path in Directory.EnumerateFiles(sourcePath, "*.dll"))
+            var extensionReferences = new List<ExtensionReference>();
+            var targetAssemblies = Directory.EnumerateFiles(sourcePath, "*.dll")
+                .Where(f => ! Path.GetFileName(f).StartsWith("System", StringComparison.OrdinalIgnoreCase));
+
+            foreach (var path in targetAssemblies)
             {
                 try
                 {
                     Assembly assembly = Assembly.LoadFrom(path);
 
-                    assembly.ExportedTypes
-                        .Where(t => configProviderType.IsAssignableFrom(t))
+                    var extensions = assembly.ExportedTypes
+                        .Where(t => t.IsExtensionType())
                         .Select(t => new ExtensionReference
                         {
                             Name = t.Name,
                             TypeName = t.AssemblyQualifiedName
-                        })
-                        .Aggregate(extensionObjects, (a, r) =>
-                        {
-                            a.Add(string.Format("{{ \"name\": \"{0}\", \"typeName\":\"{1}\"}}", r.Name, r.TypeName));
-                            return a;
                         });
 
-                    //var metadata = new
-                    //{
-                    //    extensions = new List<ExtensionReference>(extensions)
-                    //};
-
-                    //var serializationSettings = new JsonSerializerSettings
-                    //{
-                    //    Formatting = Formatting.Indented,
-                    //    ContractResolver = new DefaultContractResolver
-                    //    {
-                    //        NamingStrategy = new CamelCaseNamingStrategy()
-                    //    }
-                    //};
-
-                    
-
-                    
-
+                    extensionReferences.AddRange(extensions);
                 }
                 catch (Exception)
                 {
-                    // TODO: Support logging
-
                 }
             }
 
-            string metadataContents = string.Format("{{ \"extensions\":[{0}]}}", string.Join(",", extensionObjects));
-
+            var referenceObjects = extensionReferences.Select(r => string.Format("{{ \"name\": \"{0}\", \"typeName\":\"{1}\"}}", r.Name, r.TypeName));
+            string metadataContents = string.Format("{{ \"extensions\":[{0}]}}", string.Join(",", referenceObjects));
             File.WriteAllText(outputPath, metadataContents);
+            
+            //var serializationSettings = new JsonSerializerSettings
+            //{
+            //    Formatting = Formatting.Indented,
+            //    ContractResolver = new DefaultContractResolver
+            //    {
+            //        NamingStrategy = new CamelCaseNamingStrategy()
+            //    }
+            //};
+
+            //File.WriteAllText(outputPath, JsonConvert.SerializeObject(new { extensions = extensionReferences }, serializationSettings));
         }
     }
 }

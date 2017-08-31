@@ -16,11 +16,6 @@ namespace ExtensionsMetadataGenerator.Console
                 return;
             }
 
-            while (!Debugger.IsAttached)
-            {
-                Thread.Sleep(100);
-            }
-
             ExtensionsMetadataGenerator.Generate(args[0], args[1]);
         }
     }
