@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ExtensionsMetadataGenerator.Console": {
+      "commandName": "Project",
+      "commandLineArgs": "\"D:\\src\\gh.fabiocav\\azure-webjobs-sdk-script\\sample\\bin\" \"D:\\src\\gh.fabiocav\\azure-webjobs-sdk-script\\sample\\bin\\extensions.json\""
+    }
+  }
+}
