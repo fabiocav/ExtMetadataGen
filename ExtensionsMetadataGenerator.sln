@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionsMetadataGenerator", "ExtensionsMetadataGenerator\ExtensionsMetadataGenerator.csproj", "{18D4920B-5C4B-4519-81A5-F4A3B17B81FB}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionsMetadataGenerator.Console", "ExtensionsMetadataGenerator.Console\ExtensionsMetadataGenerator.Console.csproj", "{20786636-493A-4BB2-B6F0-5129CA51F8D5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtensionsMetadataGenerator", "ExtensionsMetadataGenerator\ExtensionsMetadataGenerator.csproj", "{18D4920B-5C4B-4519-81A5-F4A3B17B81FB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtensionsMetadataGenerator.Tests", "ExtensionsMetadataGenerator.Tests\ExtensionsMetadataGenerator.Tests.csproj", "{9CF4113B-12B3-4410-9FA7-542F8EC932C1}"
 EndProject
@@ -19,10 +17,6 @@ Global
 		{18D4920B-5C4B-4519-81A5-F4A3B17B81FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18D4920B-5C4B-4519-81A5-F4A3B17B81FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{18D4920B-5C4B-4519-81A5-F4A3B17B81FB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{20786636-493A-4BB2-B6F0-5129CA51F8D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{20786636-493A-4BB2-B6F0-5129CA51F8D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{20786636-493A-4BB2-B6F0-5129CA51F8D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{20786636-493A-4BB2-B6F0-5129CA51F8D5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9CF4113B-12B3-4410-9FA7-542F8EC932C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9CF4113B-12B3-4410-9FA7-542F8EC932C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9CF4113B-12B3-4410-9FA7-542F8EC932C1}.Release|Any CPU.ActiveCfg = Release|Any CPU

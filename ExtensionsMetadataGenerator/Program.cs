@@ -8,6 +8,8 @@ namespace ExtensionsMetadataGenerator.Console
     {
         static void Main(string[] args)
         {
+            System.Console.WriteLine("Args: " + string.Join(" ", args));
+
             if (args.Length < 2)
             {
                 System.Console.WriteLine("Usage: ");
@@ -16,7 +18,7 @@ namespace ExtensionsMetadataGenerator.Console
                 return;
             }
 
-            ExtensionsMetadataGenerator.Generate(args[0], args[1]);
+            ExtensionsMetadataGenerator.Generate(args[0], args[1], s => { });
         }
     }
 }

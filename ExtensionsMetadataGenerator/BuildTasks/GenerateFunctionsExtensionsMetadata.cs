@@ -1,4 +1,5 @@
-﻿using Microsoft.Build.Framework;
+﻿using Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator;
+using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System;
 using System.Collections.Generic;
@@ -24,37 +25,48 @@ namespace ExtensionsMetadataGenerator.BuildTasks
 
         public override bool Execute()
         {
-            Log.LogWarning("Executing");
             string outputPath = Path.Combine(OutputPath, "extensions.json");
 
-            ExtensionsMetadataGenerator.Generate(SourcePath, outputPath);
+            if (SourcePath.EndsWith("\\"))
+            {
+                SourcePath = Path.GetDirectoryName(SourcePath);
+            }
 
+            Assembly taskAssembly = typeof(GenerateFunctionsExtensionsMetadata).Assembly;
+
+            var info = new ProcessStartInfo
+            {
+                UseShellExecute = false,
+                CreateNoWindow = false,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true,
+                WorkingDirectory = Path.GetDirectoryName(taskAssembly.Location),
+                FileName = DotNetMuxer.MuxerPathOrDefault(),
+                Arguments = $"{taskAssembly.GetName().Name}.dll \"{SourcePath}\" \"{outputPath}\""
+            };
+
+            Log.LogWarning(info.Arguments);
+
+            var process = new Process { StartInfo = info };
+            process.EnableRaisingEvents = true;
+            process.ErrorDataReceived += (s, e) => Log.LogWarning(e.Data);
+            
+            process.Start();
+            process.BeginErrorReadLine();
+            process.BeginOutputReadLine();
+            process.WaitForExit();
+
+            if (process.ExitCode != 0)
+            {
+                Log.LogError("Metadata generation failed.");
+
+                return false;
+            }
+
+            process.Close();
+
+            //ExtensionsMetadataGenerator.Generate(SourcePath, outputPath, s => Log.LogWarning(s));
             return true;
         }
-
-        //private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
-        //{
-        //    Log.LogWarning("Resolving:" + args.Name);
-        //    var assemblySearchPath = Path.Combine(Path.GetDirectoryName(GetType().Assembly.Location), args.Name.Split(',')[0]);
-        //    Log.LogWarning("Path" + assemblySearchPath);
-        //    if (File.Exists(assemblySearchPath))
-        //    {
-        //        try
-        //        {
-        //            return Assembly.LoadFrom(assemblySearchPath);
-        //        }
-        //        catch (FileLoadException e)
-        //        {
-        //            var asm = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName.Contains(args.Name)).FirstOrDefault();
-
-        //            if (asm != null)
-        //            {
-        //                return asm;
-        //            }
-        //        }
-        //    }
-
-        //    return null;
-        //}
     }
 }

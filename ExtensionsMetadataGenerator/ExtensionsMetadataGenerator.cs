@@ -1,25 +1,30 @@
 ﻿using Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 using System.Text;
 
 namespace ExtensionsMetadataGenerator
 {
     public class ExtensionsMetadataGenerator
     {
-        public static void Generate(string sourcePath, string outputPath)
+        public static void Generate(string sourcePath, string outputPath, Action<string> logger)
         {
             if (!Directory.Exists(sourcePath))
             {
                 throw new DirectoryNotFoundException($"The path `{sourcePath}` does not exist. Unable to generate Azure Functions extensions metadata file.");
             }
 
+            var assemblyLoader = new AssemblyLoader(sourcePath);
+
             var extensionReferences = new List<ExtensionReference>();
             var targetAssemblies = Directory.EnumerateFiles(sourcePath, "*.dll")
-                .Where(f => ! Path.GetFileName(f).StartsWith("System", StringComparison.OrdinalIgnoreCase));
+                .Where(f => !Path.GetFileName(f).StartsWith("System", StringComparison.OrdinalIgnoreCase));
 
             foreach (var path in targetAssemblies)
             {
@@ -27,7 +32,7 @@ namespace ExtensionsMetadataGenerator
                 {
                     Assembly assembly = Assembly.LoadFrom(path);
 
-                    var extensions = assembly.ExportedTypes
+                    var extensions = assembly.GetExportedTypes()
                         .Where(t => t.IsExtensionType())
                         .Select(t => new ExtensionReference
                         {
@@ -37,25 +42,53 @@ namespace ExtensionsMetadataGenerator
 
                     extensionReferences.AddRange(extensions);
                 }
-                catch (Exception)
+                catch (Exception exc)
                 {
+                    logger(exc.Message);
                 }
             }
 
-            var referenceObjects = extensionReferences.Select(r => string.Format("{{ \"name\": \"{0}\", \"typeName\":\"{1}\"}}", r.Name, r.TypeName));
-            string metadataContents = string.Format("{{ \"extensions\":[{0}]}}", string.Join(",", referenceObjects));
-            File.WriteAllText(outputPath, metadataContents);
-            
-            //var serializationSettings = new JsonSerializerSettings
-            //{
-            //    Formatting = Formatting.Indented,
-            //    ContractResolver = new DefaultContractResolver
-            //    {
-            //        NamingStrategy = new CamelCaseNamingStrategy()
-            //    }
-            //};
+            //var referenceObjects = extensionReferences.Select(r => string.Format("{{ \"name\": \"{0}\", \"typeName\":\"{1}\"}}", r.Name, r.TypeName));
+            //string metadataContents = string.Format("{{ \"extensions\":[{0}]}}", string.Join(",", referenceObjects));
+            //File.WriteAllText(outputPath, metadataContents);
 
-            //File.WriteAllText(outputPath, JsonConvert.SerializeObject(new { extensions = extensionReferences }, serializationSettings));
+            var serializationSettings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                ContractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new CamelCaseNamingStrategy()
+                }
+            };
+
+            File.WriteAllText(outputPath, JsonConvert.SerializeObject(new { extensions = extensionReferences }, serializationSettings));
+        }
+
+        private class AssemblyLoader
+        {
+            private readonly string _basePath;
+
+            public AssemblyLoader(string basePath)
+            {
+                _basePath = basePath;
+                AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+            }
+
+            private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+            {
+                
+                string assemblyName = new AssemblyName(args.Name).Name;
+                string assemblyPath = Path.Combine(_basePath, assemblyName + ".dll");
+
+                if (File.Exists(assemblyPath))
+                {
+                    var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);//Assembly.LoadFrom(assemblyPath);
+
+                    return assembly;
+                }
+
+                return null;
+            }
         }
     }
 }
