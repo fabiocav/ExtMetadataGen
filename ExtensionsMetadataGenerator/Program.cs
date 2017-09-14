@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using System.Threading;
 
 namespace ExtensionsMetadataGenerator.Console
@@ -8,8 +10,6 @@ namespace ExtensionsMetadataGenerator.Console
     {
         static void Main(string[] args)
         {
-            System.Console.WriteLine("Args: " + string.Join(" ", args));
-
             if (args.Length < 2)
             {
                 System.Console.WriteLine("Usage: ");
@@ -20,5 +20,6 @@ namespace ExtensionsMetadataGenerator.Console
 
             ExtensionsMetadataGenerator.Generate(args[0], args[1], s => { });
         }
+
     }
 }

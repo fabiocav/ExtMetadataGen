@@ -45,11 +45,9 @@ namespace ExtensionsMetadataGenerator.BuildTasks
                 Arguments = $"{taskAssembly.GetName().Name}.dll \"{SourcePath}\" \"{outputPath}\""
             };
 
-            Log.LogWarning(info.Arguments);
-
             var process = new Process { StartInfo = info };
             process.EnableRaisingEvents = true;
-            process.ErrorDataReceived += (s, e) => Log.LogWarning(e.Data);
+            process.ErrorDataReceived += (s, e) => { if (e.Data != null) Log.LogWarning(e.Data); };
             
             process.Start();
             process.BeginErrorReadLine();

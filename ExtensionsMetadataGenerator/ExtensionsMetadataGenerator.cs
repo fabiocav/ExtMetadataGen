@@ -1,6 +1,4 @@
 ﻿using Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -44,24 +42,24 @@ namespace ExtensionsMetadataGenerator
                 }
                 catch (Exception exc)
                 {
-                    logger(exc.Message);
+                    logger(exc.Message ?? $"Errot processing {path}");
                 }
             }
 
-            //var referenceObjects = extensionReferences.Select(r => string.Format("{{ \"name\": \"{0}\", \"typeName\":\"{1}\"}}", r.Name, r.TypeName));
-            //string metadataContents = string.Format("{{ \"extensions\":[{0}]}}", string.Join(",", referenceObjects));
-            //File.WriteAllText(outputPath, metadataContents);
+            var referenceObjects = extensionReferences.Select(r => string.Format("{2}    {{ \"name\": \"{0}\", \"typeName\":\"{1}\"}}", r.Name, r.TypeName, Environment.NewLine));
+            string metadataContents = string.Format("{{{1}  \"extensions\":[{0}{1}  ]{1}}}", string.Join(",", referenceObjects), Environment.NewLine);
+            File.WriteAllText(outputPath, metadataContents);
 
-            var serializationSettings = new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented,
-                ContractResolver = new DefaultContractResolver
-                {
-                    NamingStrategy = new CamelCaseNamingStrategy()
-                }
-            };
+            //var serializationSettings = new JsonSerializerSettings
+            //{
+            //    Formatting = Formatting.Indented,
+            //    ContractResolver = new DefaultContractResolver
+            //    {
+            //        NamingStrategy = new CamelCaseNamingStrategy()
+            //    }
+            //};
 
-            File.WriteAllText(outputPath, JsonConvert.SerializeObject(new { extensions = extensionReferences }, serializationSettings));
+            //File.WriteAllText(outputPath, JsonConvert.SerializeObject(new { extensions = extensionReferences }, serializationSettings));
         }
 
         private class AssemblyLoader

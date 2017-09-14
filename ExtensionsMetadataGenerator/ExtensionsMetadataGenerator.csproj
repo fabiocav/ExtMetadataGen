@@ -19,20 +19,18 @@
     </Content>
   </ItemGroup>
 
-  <!--<Target Name="PackReferenceAssemblies" AfterTargets="Build">
+  <Target Name="PackReferenceAssemblies" AfterTargets="Build">
     <ItemGroup>
       <None Include="$(OutputPath)\*.dll">
         <Pack>true</Pack>
-        <PackagePath>tools\netstandard2.0\;tools\net46\</PackagePath>
+        <PackagePath>tools\netstandard2.0\</PackagePath>
       </None>
     </ItemGroup>
-  </Target>-->
+  </Target>
   
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Framework" Version="15.3.409" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.3.409" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="System.Reflection.Metadata" Version="1.5.0" />
   </ItemGroup>
   
   <ItemGroup>
