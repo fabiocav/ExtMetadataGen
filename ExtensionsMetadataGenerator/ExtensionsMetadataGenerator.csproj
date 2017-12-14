@@ -1,15 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
+    <OutputType>Library</OutputType>
+    <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
     <AssemblyName>Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator</AssemblyName>
     <RootNamespace>Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator</RootNamespace>
     <BuildOutputTargetFolder>tools</BuildOutputTargetFolder>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-    <StartupObject>ExtensionsMetadataGenerator.Console.Program</StartupObject>
+    <Description>Azure Functions extensions metadata generator</Description>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,10 +31,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Framework" Version="15.3.409" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.3.409" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="Extensions\" />
   </ItemGroup>
   
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">

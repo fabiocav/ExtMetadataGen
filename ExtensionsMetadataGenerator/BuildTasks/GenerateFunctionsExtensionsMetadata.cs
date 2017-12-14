@@ -40,9 +40,9 @@ namespace ExtensionsMetadataGenerator.BuildTasks
                 CreateNoWindow = false,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
-                WorkingDirectory = Path.GetDirectoryName(taskAssembly.Location),
+                WorkingDirectory = Path.Combine(Path.GetDirectoryName(taskAssembly.Location), "..", "netstandard2.0", "generator"),
                 FileName = DotNetMuxer.MuxerPathOrDefault(),
-                Arguments = $"{taskAssembly.GetName().Name}.dll \"{SourcePath}\" \"{outputPath}\""
+                Arguments = $"Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator.Console.dll \"{SourcePath}\" \"{outputPath}\""
             };
 
             var process = new Process { StartInfo = info };

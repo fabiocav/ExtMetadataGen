@@ -1,11 +1,14 @@
 ﻿<Project>
 
   <PropertyGroup>
-    <_FunctionsTaskFramework Condition=" '$(MSBuildRuntimeType)' == 'Core'">netstandard2.0</_FunctionsTaskFramework>
-    <_FunctionsTaskFramework Condition=" '$(_FunctionsTaskFramework)' == ''">net46</_FunctionsTaskFramework>
-    <_FunctionsExtensionsTasksDir Condition=" '$(_FunctionsExtensionsTasksDir)'=='' ">$(MSBuildThisFileDirectory)..\tools\$(_FunctionsTaskFramework)</_FunctionsExtensionsTasksDir>
-    <_FunctionsExtensionsTaskAssemblyFullPath Condition=" '$(_FunctionsTaskAssemblyFullPath)'=='' ">$(_FunctionsExtensionsTasksDir)\Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator.dll</_FunctionsExtensionsTaskAssemblyFullPath>
+    <_FunctionsExtensionsTaskFramework Condition=" '$(MSBuildRuntimeType)' == 'Core'">netstandard2.0</_FunctionsExtensionsTaskFramework>
+    <_FunctionsExtensionsTaskFramework Condition=" '$(_FunctionsExtensionsTaskFramework)' == ''">net46</_FunctionsExtensionsTaskFramework>
+    <_FunctionsExtensionsTasksDir Condition=" '$(_FunctionsExtensionsTasksDir)'=='' ">$(MSBuildThisFileDirectory)..\tools\$(_FunctionsExtensionsTaskFramework)</_FunctionsExtensionsTasksDir>
+    <_FunctionsExtensionsTaskAssemblyFullPath Condition=" '$(_FunctionsExtensionsTaskAssemblyFullPath)'=='' ">$(_FunctionsExtensionsTasksDir)\Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator.dll</_FunctionsExtensionsTaskAssemblyFullPath>
     <IsPackable>false</IsPackable>
+    <_IsFunctionsSdkBuild Condition="$(_FunctionsTaskFramework) != ''">true</_IsFunctionsSdkBuild>
+    <_FunctionsExtensionsDir>$(TargetDir)</_FunctionsExtensionsDir>
+    <_FunctionsExtensionsDir Condition="$(_IsFunctionsSdkBuild) == 'true'">$(_FunctionsExtensionsDir)bin</_FunctionsExtensionsDir>
   </PropertyGroup>
 
   <UsingTask TaskName="GenerateFunctionsExtensionsMetadata"
@@ -13,13 +16,21 @@
 
   <Target Name="_GenerateFunctionsExtensionsMetadataPostBuild"
           AfterTargets="Build">
+    
     <GenerateFunctionsExtensionsMetadata
-      SourcePath="$(TargetDir)"
-      OutputPath="$(TargetDir)"/>
+      SourcePath="$(_FunctionsExtensionsDir)"
+      OutputPath="$(_FunctionsExtensionsDir)"/>
+    
+    <Move Condition="$(_IsFunctionsSdkBuild) == 'true' AND Exists('$(TargetDir)extensions.json')" 
+          SourceFiles="$(TargetDir)extensions.json"
+          DestinationFiles="$(TargetDir)bin\extensions.json"
+          OverwriteReadOnlyFiles="true" 
+          ContinueOnError="true"/>
   </Target>
 
-  <Target Name="_ResolveAdditionalReferenceCopyLocalPathsForFunctions" AfterTargets="ResolveReferences"
-     >
+  <Target Name="_ResolveAdditionalReferenceCopyLocalPathsForFunctionsExtensions"
+          AfterTargets="ResolveReferences"
+          Condition="$(_IsFunctionsSdkBuild) != 'true'">
 
     <!--
       Copy publish assemblies that not already included in ReferenceCopyLocalPaths

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -52,7 +53,10 @@ namespace Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator
             // if Process.MainModule is not available or it does not equal "dotnet(.exe)?", fallback to navigating to the muxer
             // by using the location of the shared framework
 
-            var fxDepsFile = AppContext.GetData("FX_DEPS_FILE") as string;
+            var method = typeof(AppContext).GetMethod("GetData", BindingFlags.Public | BindingFlags.Static);
+            var fxDepsFile = method != null
+                ? method.Invoke(null, new[] { "FX_DEPS_FILE" }) as string
+                : null;
 
             if (string.IsNullOrEmpty(fxDepsFile))
             {

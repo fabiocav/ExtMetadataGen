@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Threading;
 
 namespace ExtensionsMetadataGenerator.Console
 {
@@ -11,9 +14,12 @@ namespace ExtensionsMetadataGenerator.Console
             {
                 System.Console.WriteLine("Usage: ");
                 System.Console.WriteLine("metadatagen <sourcepath> <output>");
+
+                return;
             }
 
-            ExtensionsMetadataGenerator.Generate(args[0], args[1]);
+            ExtensionsMetadataGenerator.Generate(args[0], args[1], s => { });
         }
+
     }
 }
