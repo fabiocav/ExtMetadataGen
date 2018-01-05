@@ -1,10 +1,13 @@
-﻿using Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator;
+﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator;
 #if !NET46
 using System.Runtime.Loader;
 #endif
@@ -13,7 +16,6 @@ namespace ExtensionsMetadataGenerator
 {
     public class ExtensionsMetadataGenerator
     {
-
         public static void Generate(string sourcePath, string outputPath, Action<string> logger)
         {
             if (!Directory.Exists(sourcePath))

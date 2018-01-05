@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -7,9 +10,9 @@ using System.Threading;
 
 namespace ExtensionsMetadataGenerator.Console
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             if (args.Length < 2)
             {
@@ -30,7 +33,6 @@ namespace ExtensionsMetadataGenerator.Console
 
             public static void Initialize(string basePath)
             {
-                
                 if (Interlocked.CompareExchange(ref _initialized, 1, 0) == 0)
                 {
                     AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
