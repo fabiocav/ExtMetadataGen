@@ -13,10 +13,6 @@ namespace ExtensionsMetadataGenerator
 {
     public class ExtensionsMetadataGenerator
     {
-        static ExtensionsMetadataGenerator()
-        {
-
-        }
 
         public static void Generate(string sourcePath, string outputPath, Action<string> logger)
         {

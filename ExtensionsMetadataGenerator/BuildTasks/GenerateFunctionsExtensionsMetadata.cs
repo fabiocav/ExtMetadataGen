@@ -63,7 +63,6 @@ namespace ExtensionsMetadataGenerator.BuildTasks
 
             process.Close();
 
-            //ExtensionsMetadataGenerator.Generate(SourcePath, outputPath, s => Log.LogWarning(s));
             return true;
         }
     }
